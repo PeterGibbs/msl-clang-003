@@ -427,8 +427,9 @@ static void test_pool_bf_metadata(void **state) {
                     {pool->total_size - 1000, 0},
             };
     check_metadata(pool, BEST_FIT, POOL_SIZE, 450, 5, 4);
-
-
+    printf("aaaaa\n");
+    print_pool(pool);
+    printf("aaaaa\n");
     void * alloc1 = mem_new_alloc(pool, 50);
     assert_non_null(alloc1);
     pool_segment_t exp3[9] =
