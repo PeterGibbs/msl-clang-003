@@ -271,7 +271,7 @@ alloc_status mem_pool_close(pool_pt pool) {
 }
 
 void * mem_new_alloc(pool_pt pool, size_t size) {
-    printf("Inserting segment %lu",(unsigned long)size);
+   // printf("Inserting segment %lu",(unsigned long)size);
     // get mgr from pool by casting the pointer to (pool_mgr_pt)
     pool_mgr_pt mgr=(pool_mgr_pt)pool;
     // check if any gaps, return null if none
@@ -367,7 +367,7 @@ void * mem_new_alloc(pool_pt pool, size_t size) {
         new_gap_node->prev = node_to_alloc;
 
 
-        
+
         new_gap_node->alloc_record.size=old_gap_size-node_to_alloc->alloc_record.size;
         new_gap_node->used=1;
         new_gap_node->allocated=0;
@@ -386,7 +386,7 @@ void * mem_new_alloc(pool_pt pool, size_t size) {
     //   add to gap index
     //   check if successful
     // return allocation record by casting the node to (alloc_pt)
-    printf("   DONE\n");
+   // printf("   DONE\n");
     return (alloc_pt)node_to_alloc;
 }
 
@@ -398,7 +398,7 @@ alloc_status mem_del_alloc(pool_pt pool, void * alloc) {
 
     // get node from alloc by casting the pointer to (node_pt)
     node_pt node_to_find=(node_pt)alloc;
-    printf("removing segment with size %lu\n",(unsigned long)node_to_find->alloc_record.size);
+   // printf("removing segment with size %lu\n",(unsigned long)node_to_find->alloc_record.size);
     assert(node_to_find->allocated==1);
     // find the node in the node heap
     node_pt node_to_remove=mgr->node_heap;
@@ -493,7 +493,7 @@ alloc_status mem_del_alloc(pool_pt pool, void * alloc) {
     //   change the node to add to the previous node!
     // add the resulting node to the gap index
     // check success
-    printf("   DONE\n");
+    //printf("   DONE\n");
     return ALLOC_OK;
 }
 
@@ -539,7 +539,7 @@ static alloc_status _mem_resize_pool_store() {
 
                 if (((float) pool_store_size / pool_store_capacity)
                     > MEM_POOL_STORE_FILL_FACTOR) {
-
+                    printf("RESISING POOL\n");
                     pool_store_capacity*=MEM_POOL_STORE_EXPAND_FACTOR;
                     pool_store=realloc(pool_store, pool_store_capacity* sizeof(pool_mgr_pt));
                     if(pool_store==NULL){
@@ -558,6 +558,7 @@ static alloc_status _mem_resize_node_heap(pool_mgr_pt pool_mgr) {
     // see above
     if (((float) pool_mgr->used_nodes / pool_mgr->total_nodes)
         > MEM_NODE_HEAP_FILL_FACTOR) {
+        printf("RESISING HEAP\n");
         pool_mgr->total_nodes=pool_mgr->total_nodes*MEM_NODE_HEAP_EXPAND_FACTOR;
 
         pool_mgr->node_heap=realloc(pool_mgr->node_heap, pool_mgr->total_nodes* sizeof(struct _node));
@@ -574,7 +575,7 @@ static alloc_status _mem_resize_gap_ix(pool_mgr_pt pool_mgr) {
     // see above
     if (((float) pool_mgr->pool.num_gaps / pool_mgr->gap_ix_capacity)
         > MEM_GAP_IX_FILL_FACTOR ) {
-
+        printf("RESISING GAP_IX\n");
         pool_mgr->gap_ix_capacity= pool_mgr->gap_ix_capacity*MEM_GAP_IX_EXPAND_FACTOR;
         pool_mgr->gap_ix=realloc(pool_mgr->gap_ix, pool_mgr->gap_ix_capacity* sizeof(struct _gap));
         if(pool_mgr->gap_ix==NULL){
@@ -611,7 +612,7 @@ static alloc_status _mem_add_to_gap_ix(pool_mgr_pt pool_mgr,
 
     // check success
 
-    printf("Inserting node with size %lu\n",(unsigned long)size);
+    //printf("Inserting node with size %lu\n",(unsigned long)size);
     return _mem_sort_gap_ix(pool_mgr);
     //return ALLOC_OK;
 }
@@ -643,7 +644,7 @@ static alloc_status _mem_remove_from_gap_ix(pool_mgr_pt pool_mgr,
     //    this effectively deletes the chosen node
     // update metadata (num_gaps)
     // zero out the element at position num_gaps!
-    printf("Removing node with size %lu\n",(unsigned long)size);
+   // printf("Removing node with size %lu\n",(unsigned long)size);
     return ALLOC_OK;
 }
 
@@ -662,7 +663,7 @@ static alloc_status _mem_sort_gap_ix(pool_mgr_pt pool_mgr) {
         int current_empty=pool_mgr->gap_ix[i].size==0;
 
         if((current_empty&next_non_empty)|(next_size_smaller&next_non_empty)|(next_size_equal&next_address_smaller&next_non_empty)){
-
+            /*
             printf("Swaping node [i-1] with size ");
             unsigned long s1=(unsigned long)pool_mgr->gap_ix[i-1].size;
             unsigned long s2=(unsigned long)pool_mgr->gap_ix[i].size;
@@ -670,6 +671,7 @@ static alloc_status _mem_sort_gap_ix(pool_mgr_pt pool_mgr) {
             printf("and node [i] with size ");
             printf("%lu",s2);
             printf("\n");
+             */
             struct _gap temp=pool_mgr->gap_ix[i-1];
             pool_mgr->gap_ix[i-1]=pool_mgr->gap_ix[i];
             pool_mgr->gap_ix[i]=temp;
