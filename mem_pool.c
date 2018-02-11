@@ -278,6 +278,9 @@ void * mem_new_alloc(pool_pt pool, size_t size) {
     if(mgr->pool.num_gaps==0){
         return NULL;
     }
+    if((mgr->pool.total_size<=size)|((mgr->pool.total_size-mgr->pool.alloc_size)<=size)){
+        return NULL;
+    }
     // expand heap node, if necessary, quit on error
     assert(ALLOC_OK==_mem_resize_node_heap(mgr));
     node_pt heap=mgr->node_heap;
@@ -319,11 +322,26 @@ void * mem_new_alloc(pool_pt pool, size_t size) {
 
     }
     assert(node_to_alloc!=NULL);
+    //check if the size is larger then the largest gap
+    int size_check=0;
+    for(int i=0; i<mgr->gap_ix_capacity; ++i){
+        if(mgr->gap_ix[i].node!=NULL) {
+            assert(mgr->gap_ix[i].node->allocated != 1);
+        }
+        if(mgr->gap_ix[i].size>=size) {
+            size_check=1;
+            break;
+        }
+    }
+    if(!size_check){
+        return NULL;
+    }
     // check if node found
     // update metadata (num_allocs, alloc_size)
     mgr->pool.num_allocs++;
     size_t old_size=mgr->pool.alloc_size;
-    mgr->pool.alloc_size=old_size+size;
+    mgr->pool.alloc_size+=size;
+
 
     size_t remaining_gap_size=0;
     // calculate the size of the remaining gap, if any
@@ -463,6 +481,7 @@ alloc_status mem_del_alloc(pool_pt pool, void * alloc) {
         //   add the size of node-to-delete to the previous
         //   update node-to-delete as unused
         //   update metadata (used_nodes)
+
         //   update linked list
         if (node_to_remove->prev) {
             node_pt prev = node_to_remove->prev;
