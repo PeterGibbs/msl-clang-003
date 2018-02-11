@@ -98,8 +98,8 @@ static void check_metadata(pool_pt pool,
         printf("%10lu - %s\n", (unsigned long) segs[u].size, (segs[u].allocated) ? "alloc" : "gap");
 
     printf("%10s = %lu(%lu),\n%10s = %lu(%lu),\n%10s = %u(%u),\n%10s = %u(%u)\n",
-           (char *) "total_size", pool->total_size, total_size,
-           (char *) "alloc_size", pool->alloc_size, alloc_size,
+           (char *) "total_size", (unsigned long)pool->total_size, (unsigned long)total_size,
+           (char *) "alloc_size", (unsigned long)pool->alloc_size, (unsigned long)alloc_size,
            (char *) "num_allocs", pool->num_allocs, num_allocs,
            (char *) "num_gaps",   pool->num_gaps,   num_gaps);
 #endif
